@@ -1,0 +1,24 @@
+<!-- 用于控制实体宇树z1 机械臂 启动前需要：1 运行z1 官方的 controller通信包 ./z1_ctrl 2,运行数据转换的包(~/Projects/Unitree_arm_prj/Projects/Unitree_Z_one) rosrun unitree_z1_mpc policy_to_real-->
+<launch>
+    <!-- Enable rviz visualization -->
+    <arg name="rviz"        default="true" />
+    <!-- Set nodes on debug mode -->
+    <arg name="debug"       default="false" />
+
+    <!-- The URDF model of the robot -->
+    <arg name="urdfFile"    value="$(find ocs2_robotic_assets)/resources/mobile_manipulator/unitree_z1/urdf/z1.urdf" />
+    <!-- The task file for the mpc. -->
+    <arg name="taskFile"    value="$(find ocs2_mobile_manipulator)/config/unitree_z1/task.info" />
+    <!-- The library folder to generate CppAD codegen into -->
+    <arg name="libFolder"   value="$(find ocs2_mobile_manipulator)/auto_generated/unitree_z1" />
+    <include file="$(find ocs2_ros_interfaces)/launch/performance_indices.launch">
+          <arg name="mpc_policy_topic_name"      value="mobile_manipulator_mpc_policy"/>
+        </include>
+    <include file="$(find ocs2_mobile_manipulator_ros)/launch/include/z1_real_arm.launch">
+          <arg name="rviz"        value="$(arg rviz)" />
+          <arg name="debug"       value="$(arg debug)" />
+          <arg name="urdfFile"    value="$(arg urdfFile)" />
+          <arg name="taskFile"    value="$(arg taskFile)" />
+          <arg name="libFolder"   value="$(arg libFolder)" />
+    </include>
+</launch>
