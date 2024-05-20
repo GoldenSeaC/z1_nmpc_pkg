@@ -20,5 +20,6 @@
           <arg name="urdfFile"    value="$(arg urdfFile)" />
           <arg name="taskFile"    value="$(arg taskFile)" />
           <arg name="libFolder"   value="$(arg libFolder)" />
+          <arg name="real_robot_flag"   default="false"/>
     </include>
 </launch>
