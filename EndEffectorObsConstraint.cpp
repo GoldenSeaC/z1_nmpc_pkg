@@ -51,21 +51,22 @@ VectorFunctionLinearApproximation EndEffectorObtConstraint::getLinearApproximati
     const auto eePosition = endEffectorKinematicsPtr_->getPositionLinearApproximation(state).front();
     // vector_t input(6);
     // vector3_t state_dot=endEffectorKinematicsPtr_->getVelocity(state,input.setZero()).front();
-    
+    approximation.f=this->getValue(time,state,preComputation);
     //获取雅可比的上三行
     matrix_t J_pos=eePosition.dfdx;//这里时不是要换成endEffectorKinematicsPtr_
-    vector_t h_dot=J_pos.transpose()*(state.head<3>()-std::get<1>(obstacle_positions_.front()));
-    Eigen::Matrix<scalar_t, 3, 1> obstacle_1=std::get<1>(obstacle_positions_.front());
-    scalar_t norm_down=(endEffectorKinematicsPtr_->getPosition(state).front()-obstacle_1).norm();
-    approximation.f=this->getValue(time,state,preComputation);
-    //fill the dfdx matrix with obs_row x state_clo
     matrix_t obs_dfx(obstacle_positions_.size(),state.rows());
     for(int i=0;i<obstacle_positions_.size();i++){
+        vector_t h_dot=J_pos.transpose()*(eePosition.f-std::get<1>(obstacle_positions_[i]));
+        Eigen::Matrix<scalar_t, 3, 1> obstacle_i=std::get<1>(obstacle_positions_[i]);
+        scalar_t norm_down=(endEffectorKinematicsPtr_->getPosition(state).front()-obstacle_i).norm();
         obs_dfx.row(i)=(h_dot*(1/norm_down)).transpose();
     }
+    // for(int i=0;i<obstacle_positions_.size();i++){
+    //     obs_dfx.row(i)=(h_dot*(1/norm_down)).transpose();
+    // }
     approximation.dfdx=obs_dfx;
     approximation.dfdu=approximation.dfdx;
-    approximation.dfdu.setZero();
+    // approximation.dfdu.setZero();
     // std::cout<<"obs!! linear approximaion \n"<<approximation.dfdx<<std::endl;
     return approximation;
 }
